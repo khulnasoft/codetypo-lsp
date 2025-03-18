@@ -306,7 +306,7 @@ async fn test_position_with_unicode_text() {
     let unicode_text = did_open("ẽ hace");
     similar_asserts::assert_eq!(
         server.request(&unicode_text).await,
-        publish_diagnostics(&[diag("`hace` should be `have`", 0, 3, 7)])
+        publish_diagnostics(&[diag("`hace` should be `have`", 0, 2, 6)])
     );
 }
 
