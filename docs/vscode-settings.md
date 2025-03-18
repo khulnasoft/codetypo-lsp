@@ -2,7 +2,7 @@
 
 This extension contributes the following settings:
 
-- `codetypo.config`: Custom config. Used together with a config file found in the workspace or its parents, taking precedence for settings declared in both. Equivalent to the codetypo `--config` [cli argument](https://github.com/crate-ci/codetypo/blob/master/docs/reference.md).
+- `codetypo.config`: Custom config. Used together with a config file found in the workspace or its parents, taking precedence for settings declared in both. Equivalent to the codetypo `--config` [cli argument](https://github.com/khulnasoft/codetypo/blob/rust/docs/reference.md).
 - `codetypo.diagnosticSeverity`: How codetypo are rendered in the editor, can be one of an Error, Warning, Information or Hint.
 - `codetypo.logLevel`: Logging level of the language server. Logs appear in the _Output -> Codetypo_ pane.
 - `codetypo.path`: Path to the `codetypo-lsp` binary. If empty the bundled binary will be used.
