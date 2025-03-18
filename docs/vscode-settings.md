@@ -12,6 +12,6 @@ To disable `codetypo` per workspace, see [disable this extension](https://code.v
 
 ## VS Code Commands
 
-| Command        | Description         |
-| -------------- | ------------------- |
+| Command           | Description         |
+| ----------------- | ------------------- |
 | Codetypo: Restart | Restart the server. |
