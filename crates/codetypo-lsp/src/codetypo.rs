@@ -1,8 +1,8 @@
 use std::path::Path;
 
 use bstr::ByteSlice;
-use ignore::overrides::{Override, OverrideBuilder};
 use codetypo_cli::policy;
+use ignore::overrides::{Override, OverrideBuilder};
 pub struct Instance<'s> {
     pub ignores: Override,
     pub engine: policy::ConfigEngine<'s>,

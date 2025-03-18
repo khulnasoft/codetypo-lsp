@@ -5,11 +5,11 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
+use codetypo_cli::policy;
 use serde_json::{json, to_string};
 use tower_lsp::lsp_types::*;
 use tower_lsp::*;
 use tower_lsp::{Client, LanguageServer};
-use codetypo_cli::policy;
 
 use crate::state::{url_path_sanitised, BackendState};
 pub struct Backend<'s, 'p> {

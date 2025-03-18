@@ -1,5 +1,5 @@
-use tower_lsp::{LspService, Server};
 use codetypo_lsp::lsp;
+use tower_lsp::{LspService, Server};
 
 #[tokio::main]
 async fn main() {
