@@ -1,0 +1,138 @@
+{
+  "name": "codetypo-vscode",
+  "displayName": "Codetypo spell checker",
+  "description": "Low false-positive source code spell checker",
+  "publisher": "khulnasoft",
+  "version": "0.1.35",
+  "private": true,
+  "icon": "images/codetypo.png",
+  "repository": {
+    "url": "https://github.com/khulnasoft/codetypo-lsp.git",
+    "type": "git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "spell",
+    "checker",
+    "spelling",
+    "spellchecker"
+  ],
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "engines": {
+    "node": "^20.18.0",
+    "vscode": "^1.84.0"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/main.js",
+  "contributes": {
+    "commands": [
+      {
+        "category": "Codetypo",
+        "command": "codetypo.restart",
+        "title": "Restart"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Codetypo",
+      "properties": {
+        "codetypo.path": {
+          "scope": "machine-overridable",
+          "type": "string",
+          "description": "Path to the `codetypo-lsp` binary. If empty the bundled binary will be used."
+        },
+        "codetypo.config": {
+          "scope": "machine-overridable",
+          "type": "string",
+          "description": "Path to a custom config file. Used together with any workspace config files, taking precedence for settings declared in both."
+        },
+        "codetypo.diagnosticSeverity": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "Error",
+            "Warning",
+            "Information",
+            "Hint"
+          ],
+          "enumDescriptions": [
+            "Red squiggle",
+            "Yellow squiggle",
+            "Blue squiggle",
+            "Dots"
+          ],
+          "default": "Warning",
+          "description": "How codetypo are rendered in the editor."
+        },
+        "codetypo.logLevel": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "off",
+            "error",
+            "warn",
+            "info",
+            "debug",
+            "trace"
+          ],
+          "default": "warn",
+          "markdownDescription": "Logging level of the language server. Logs appear in the _Output -> Codetypo_ pane."
+        },
+        "codetypo.trace.server": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "enumDescriptions": [
+            "No traces",
+            "Trace sent/received",
+            "Includes content of messages"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server. Recommended for debugging only."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "package": "vsce package",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+    "build": "npm run esbuild-base -- --sourcemap",
+    "watch": "npm run esbuild-base -- --sourcemap --watch",
+    "lint": "prettier --check . && eslint src --ext ts",
+    "fix": "prettier --write . && eslint src --ext ts --fix",
+    "pretest": "tsc && npm run build",
+    "test": "cross-env CODETYPO_LSP_PATH=$PWD/target/debug/codetypo-lsp node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^3.0.1",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.84.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.2.2",
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.24.2",
+    "eslint": "^8.57.1",
+    "glob": "^11.0.1",
+    "mocha": "^11.1.0",
+    "ovsx": "^0.10.1",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  }
+}

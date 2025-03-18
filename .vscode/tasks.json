@@ -1,0 +1,50 @@
+// See https://go.microsoft.com/fwlink/?LinkId=733558
+// for the documentation about the tasks.json format
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cargo",
+			"command": "build",
+			"problemMatcher": "$rustc",
+			"group": "build"
+		},
+		{
+			"type": "npm",
+			"script": "watch",
+			"problemMatcher": "$tsc-watch",
+			"isBackground": true,
+			"presentation": {
+				"reveal": "never"
+			},
+			"group": "build"
+		},
+		{
+			"type": "npm",
+			"script": "build",
+			"problemMatcher": "$tsc",
+			"group": "build"
+		},
+		{
+			"type": "npm",
+			"script": "pretest",
+			"problemMatcher": "$tsc",
+			"group": "build"
+		},
+		{
+			"label": "build all",
+			"dependsOn": [
+				"cargo: build",
+				"npm: pretest"
+			],
+			"problemMatcher": [
+				"$rustc",
+				"$tsc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}

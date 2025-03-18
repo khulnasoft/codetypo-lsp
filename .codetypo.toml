@@ -1,0 +1,2 @@
+[files]
+extend-exclude = ["CHANGELOG.md", "crates/codetypo-lsp/tests/integration_test.rs"]
