@@ -110,6 +110,8 @@
     "watch": "npm run esbuild-base -- --sourcemap --watch",
     "lint": "prettier --check . && eslint src --ext ts",
     "fix": "prettier --write . && eslint src --ext ts --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "pretest": "tsc && npm run build",
     "test": "cross-env CODETYPO_LSP_PATH=$PWD/target/debug/codetypo-lsp node ./out/test/runTest.js"
   },

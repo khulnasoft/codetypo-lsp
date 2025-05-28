@@ -1,3 +1,5 @@
+//! LSP server implementation using tower-lsp for Codetypo.
+
 use matchit::Match;
 
 use std::borrow::Cow;
@@ -12,19 +14,24 @@ use tower_lsp::*;
 use tower_lsp::{Client, LanguageServer};
 
 use crate::state::{url_path_sanitised, BackendState};
+/// LSP backend for Codetypo, managing client and workspace state.
 pub struct Backend<'s, 'p> {
     client: Client,
     state: Mutex<crate::state::BackendState<'s>>,
     default_policy: policy::Policy<'p, 'p, 'p>,
 }
 
+/// Diagnostic data attached to LSP diagnostics, including correction suggestions.
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 struct DiagnosticData<'c> {
     corrections: Vec<Cow<'c, str>>,
 }
 
 #[tower_lsp::async_trait]
+/// Implements the LSP server for Codetypo.
+#[tower_lsp::async_trait]
 impl LanguageServer for Backend<'static, 'static> {
+    /// Handles LSP initialize request.
     async fn initialize(&self, params: InitializeParams) -> jsonrpc::Result<InitializeResult> {
         tracing::debug!("initialize: {}", to_string(&params).unwrap_or_default());
 
@@ -113,17 +120,20 @@ impl LanguageServer for Backend<'static, 'static> {
         })
     }
 
+    /// Called when the server has been initialized.
     async fn initialized(&self, _: InitializedParams) {
         self.client
             .log_message(MessageType::INFO, "server initialized!")
             .await;
     }
 
+    /// Handles opening of a text document.
     async fn did_open(&self, params: DidOpenTextDocumentParams) {
         tracing::debug!("did_open: {:?}", to_string(&params).unwrap_or_default());
         self.report_diagnostics(params.text_document).await;
     }
 
+    /// Handles changes to a text document.
     async fn did_change(&self, mut params: DidChangeTextDocumentParams) {
         tracing::debug!("did_change: {:?}", to_string(&params).unwrap_or_default());
         self.report_diagnostics(TextDocumentItem {
@@ -135,11 +145,13 @@ impl LanguageServer for Backend<'static, 'static> {
         .await;
     }
 
+    /// Handles saving of a text document.
     async fn did_save(&self, params: DidSaveTextDocumentParams) {
         tracing::debug!("did_save: {:?}", to_string(&params).unwrap_or_default());
         // noop to avoid unimplemented warning log line
     }
 
+    /// Handles closing of a text document.
     async fn did_close(&self, params: DidCloseTextDocumentParams) {
         tracing::debug!("did_close: {:?}", to_string(&params).unwrap_or_default());
         // clear diagnostics to avoid a stale diagnostics flash on open
@@ -150,6 +162,7 @@ impl LanguageServer for Backend<'static, 'static> {
             .await;
     }
 
+    /// Provides code actions (quick fixes) for diagnostics.
     async fn code_action(
         &self,
         params: CodeActionParams,
@@ -210,6 +223,7 @@ impl LanguageServer for Backend<'static, 'static> {
         Ok(Some(actions))
     }
 
+    /// Handles workspace folder changes.
     async fn did_change_workspace_folders(&self, params: DidChangeWorkspaceFoldersParams) {
         tracing::debug!(
             "did_change_workspace_folders: {:?}",
@@ -222,12 +236,14 @@ impl LanguageServer for Backend<'static, 'static> {
         }
     }
 
+    /// Handles LSP shutdown request.
     async fn shutdown(&self) -> jsonrpc::Result<()> {
         Ok(())
     }
 }
 
 impl<'s> Backend<'s, '_> {
+    /// Constructs a new `Backend` with the given LSP client.
     pub fn new(client: Client) -> Self {
         Self {
             client,
@@ -236,14 +252,25 @@ impl<'s> Backend<'s, '_> {
         }
     }
 
-    async fn report_diagnostics(&self, params: TextDocumentItem) {
+    /// Reports diagnostics for the given text document.
+    /// 
+    /// # Parameters
+    /// 
+    /// * `params`: The text document to report diagnostics for.
+    pub async fn report_diagnostics(&self, params: TextDocumentItem) {
         let diagnostics = self.check_text(&params.text, &params.uri);
         self.client
             .publish_diagnostics(params.uri, diagnostics, Some(params.version))
             .await;
     }
 
-    fn check_text(&self, buffer: &str, uri: &Url) -> Vec<Diagnostic> {
+    /// Checks the given text for typos and returns diagnostics.
+    /// 
+    /// # Parameters
+    /// 
+    /// * `buffer`: The text to check for typos.
+    /// * `uri`: The URI of the text document.
+    pub fn check_text(&self, buffer: &str, uri: &Url) -> Vec<Diagnostic> {
         let state = self.state.lock().unwrap();
 
         let Some((tokenizer, dict, ignore)) = self.workspace_policy(uri, &state) else {
@@ -282,7 +309,13 @@ impl<'s> Backend<'s, '_> {
             .collect()
     }
 
-    fn workspace_policy<'a>(
+    /// Determines the workspace policy (tokenizer, dictionary, ignore rules) for a given URI.
+    /// 
+    /// # Parameters
+    /// 
+    /// * `uri`: The URI to determine the workspace policy for.
+    /// * `state`: The current state of the backend.
+    pub fn workspace_policy<'a>(
         &'a self,
         uri: &Url,
         state: &'a std::sync::MutexGuard<'a, BackendState<'s>>,

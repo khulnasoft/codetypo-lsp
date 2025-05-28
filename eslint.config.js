@@ -25,7 +25,15 @@ module.exports = [
       curly: "warn",
       eqeqeq: "warn",
       "no-throw-literal": "warn",
-      semi: "off",
+      "no-unused-vars": "warn",
+      "prefer-const": "warn",
+      "no-console": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/explicit-function-return-type": [
+        "warn",
+        { allowExpressions: true },
+      ],
+      "@typescript-eslint/strict-boolean-expressions": "warn",
     },
   },
 ];

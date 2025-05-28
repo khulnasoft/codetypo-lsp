@@ -1,3 +1,5 @@
+//! Binary entry point for Codetypo-LSP. Initializes tracing and runs the LSP server.
+
 use codetypo_lsp::lsp;
 use tower_lsp::{LspService, Server};
 

@@ -1,3 +1,5 @@
+//! Workspace and routing state management for Codetypo-LSP.
+
 use anyhow::anyhow;
 use matchit::Router;
 use std::path::{Path, PathBuf};
@@ -6,6 +8,7 @@ use tower_lsp::lsp_types::{DiagnosticSeverity, Url, WorkspaceFolder};
 use crate::codetypo::Instance;
 
 #[derive(Default)]
+/// State for the Codetypo-LSP backend, including severity, config, workspace folders, and router.
 pub(crate) struct BackendState<'s> {
     pub severity: Option<DiagnosticSeverity>,
     pub config: Option<PathBuf>,
@@ -14,6 +17,7 @@ pub(crate) struct BackendState<'s> {
 }
 
 impl BackendState<'_> {
+    /// Sets the workspace folders and updates the router.
     pub(crate) fn set_workspace_folders(
         &mut self,
         workspace_folders: Vec<WorkspaceFolder>,
@@ -23,6 +27,7 @@ impl BackendState<'_> {
         Ok(())
     }
 
+    /// Updates the workspace folders by adding and removing, then updates the router.
     pub(crate) fn update_workspace_folders(
         &mut self,
         added: Vec<WorkspaceFolder>,
@@ -36,6 +41,7 @@ impl BackendState<'_> {
         Ok(())
     }
 
+    /// Updates the internal router for workspace folders.
     pub(crate) fn update_router(&mut self) -> anyhow::Result<(), anyhow::Error> {
         self.router = Router::new();
         for folder in self.workspace_folders.iter() {
@@ -71,7 +77,9 @@ impl BackendState<'_> {
     }
 }
 
+/// Extension trait for inserting Codetypo instances into the router.
 trait RouterExt {
+    /// Inserts a new Codetypo instance into the router for the given route and path.
     fn insert_instance(
         &mut self,
         route: &str,
