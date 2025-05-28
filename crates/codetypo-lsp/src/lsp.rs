@@ -315,7 +315,7 @@ impl<'s> Backend<'s, '_> {
     ///
     /// * `uri`: The URI to determine the workspace policy for.
     /// * `state`: The current state of the backend.
-    pub fn workspace_policy<'a>(
+    pub(crate) fn workspace_policy<'a>(
         &'a self,
         uri: &Url,
         state: &'a std::sync::MutexGuard<'a, BackendState<'s>>,
