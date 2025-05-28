@@ -253,9 +253,9 @@ impl<'s> Backend<'s, '_> {
     }
 
     /// Reports diagnostics for the given text document.
-    /// 
+    ///
     /// # Parameters
-    /// 
+    ///
     /// * `params`: The text document to report diagnostics for.
     pub async fn report_diagnostics(&self, params: TextDocumentItem) {
         let diagnostics = self.check_text(&params.text, &params.uri);
@@ -265,9 +265,9 @@ impl<'s> Backend<'s, '_> {
     }
 
     /// Checks the given text for typos and returns diagnostics.
-    /// 
+    ///
     /// # Parameters
-    /// 
+    ///
     /// * `buffer`: The text to check for typos.
     /// * `uri`: The URI of the text document.
     pub fn check_text(&self, buffer: &str, uri: &Url) -> Vec<Diagnostic> {
@@ -310,9 +310,9 @@ impl<'s> Backend<'s, '_> {
     }
 
     /// Determines the workspace policy (tokenizer, dictionary, ignore rules) for a given URI.
-    /// 
+    ///
     /// # Parameters
-    /// 
+    ///
     /// * `uri`: The URI to determine the workspace policy for.
     /// * `state`: The current state of the backend.
     pub fn workspace_policy<'a>(
