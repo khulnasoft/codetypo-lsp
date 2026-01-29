@@ -1,14 +1,18 @@
+//! Core logic for Codetypo spell checking, ignore handling, and position calculations.
+
 use std::path::Path;
 
 use bstr::ByteSlice;
 use codetypo_cli::policy;
 use ignore::overrides::{Override, OverrideBuilder};
+/// Represents a Codetypo spell-checking instance with ignore rules and engine configuration.
 pub struct Instance<'s> {
     pub ignores: Override,
     pub engine: policy::ConfigEngine<'s>,
 }
 
 impl Instance<'_> {
+    /// Constructs a new `Instance` with configuration from the given path and optional config file.
     pub fn new<'s>(
         path: &Path,
         config: Option<&Path>,
@@ -55,6 +59,7 @@ impl Instance<'_> {
 // mimics codetypo_cli::file::FileChecker::check_file
 // see https://github.com/khulnasoft/codetypo/blob/c15b28fff9a814f9c12bd24cb1cfc114037e9187/crates/codetypo-cli/src/file.rs#L43
 // but using check_str instead of check_bytes
+/// Checks the given string for typos, returning an iterator over found typos and their positions.
 pub fn check_str<'b, 's: 'b>(
     buffer: &'b str,
     tokenizer: &'s codetypo::tokens::Tokenizer,
@@ -81,12 +86,14 @@ pub fn check_str<'b, 's: 'b>(
 }
 
 // copied from https://github.com/khulnasoft/codetypo/blob/c15b28fff9a814f9c12bd24cb1cfc114037e9187/crates/codetypo-cli/src/file.rs#L741
+/// Represents ignore blocks for typo checking.
 #[derive(Clone, Debug)]
 pub(crate) struct Ignores {
     blocks: Vec<std::ops::Range<usize>>,
 }
 
 impl Ignores {
+    /// Constructs a new `Ignores` from content and ignore regexes.
     pub(crate) fn new(content: &[u8], ignores: &[regex::Regex]) -> Self {
         let mut blocks = Vec::new();
         if let Ok(content) = std::str::from_utf8(content) {
@@ -99,6 +106,7 @@ impl Ignores {
         Self { blocks }
     }
 
+    /// Returns true if the given span is ignored.
     pub(crate) fn is_ignored(&self, span: std::ops::Range<usize>) -> bool {
         let start = span.start;
         let end = span.end.saturating_sub(1);
@@ -108,6 +116,7 @@ impl Ignores {
     }
 }
 
+/// Tracks line and character positions for typo reporting.
 pub struct AccumulatePosition {
     line_num: usize,
     line_pos: usize,
@@ -115,6 +124,7 @@ pub struct AccumulatePosition {
 }
 
 impl AccumulatePosition {
+    /// Constructs a new `AccumulatePosition`.
     pub fn new() -> Self {
         Self {
             // LSP ranges are 0-indexed see https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#range
@@ -124,6 +134,7 @@ impl AccumulatePosition {
         }
     }
 
+    /// Returns the (line number, character position) for a given byte offset in the buffer.
     pub fn pos(&mut self, buffer: &[u8], byte_offset: usize) -> (usize, usize) {
         assert!(self.last_offset <= byte_offset);
         let slice = &buffer[self.last_offset..byte_offset];

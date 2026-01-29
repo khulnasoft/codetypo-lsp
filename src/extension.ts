@@ -10,6 +10,7 @@ import {
 
 let client: LanguageClient | undefined;
 
+// Activates the Codetypo VSCode extension
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<void> {
@@ -66,6 +67,7 @@ export async function activate(
   await vscode.commands.executeCommand("codetypo.restart");
 }
 
+// Creates and configures the language client
 async function createClient(
   context: vscode.ExtensionContext,
   name: string,
@@ -115,6 +117,7 @@ async function createClient(
   );
 }
 
+// Resolves the server path for codetypo-lsp (env, config, or bundled)
 async function getServerPath(
   context: vscode.ExtensionContext,
   config: vscode.WorkspaceConfiguration,
@@ -159,6 +162,7 @@ async function getServerPath(
   );
 }
 
+// Deactivates the extension and stops the client
 export function deactivate(): Thenable<void> | undefined {
   if (!client) {
     return undefined;
